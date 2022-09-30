@@ -1,0 +1,14 @@
+version: '3.0'
+services:
+    accounts-server:
+        container_name: accounts-server
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: accounts-server:latest
+        ports:
+          - 8081:8081
+        env_file:
+          - ./accounts.env
+        volumes:
+          - ../keys:/keys

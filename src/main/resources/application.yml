@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: ${ACCOUNT_DB_URL}
+    username: ${ACCOUNT_DB_USERNAME}
+    password: ${ACCOUNT_DB_PASSWORD}
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+    hibernate:
+      ddl-auto: update
+
+bolaodacopa:
+  app:
+    jwtExpirationMs: ${ACCOUNT_TOKEN_EXPIRATIONMS}
+  path:
+    privateKey: ${ACCOUNT_PATH_PRIVATEKEY}
+    publicKey: ${ACCOUNT_PATH_PUBLICKEY}
+
+server:
+  port: ${ACCOUNT_DB_PORT}
+  error:
+    include-message: always
