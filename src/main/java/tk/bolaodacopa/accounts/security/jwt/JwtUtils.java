@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import tk.bolaodacopa.accounts.security.services.AccountDetailsImpl;
 
 @Component
@@ -34,7 +35,6 @@ public class JwtUtils {
 	}
 
 	public boolean validateJwtToken(String authToken) {
-
 		try {
 			Jwts.parserBuilder()
 			.setSigningKey(jwtKeyProvider.getPublicKey())

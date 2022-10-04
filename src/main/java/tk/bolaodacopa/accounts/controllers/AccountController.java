@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import tk.bolaodacopa.accounts.services.AccountService;
 import tk.bolaodacopa.accounts.payload.request.LoginRequest;
 import tk.bolaodacopa.accounts.payload.request.SignupRequest;
-import tk.bolaodacopa.accounts.payload.response.JwtResponse;
 
 @RestController
 @RequestMapping(path = "/api/auth")
@@ -27,8 +26,7 @@ public class AccountController {
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticate(@Valid @RequestBody LoginRequest loginRequest) {
-		JwtResponse jwtResponse = service.authenticate(loginRequest); 
-		return ResponseEntity.ok(jwtResponse);
+		return service.authenticate(loginRequest);
 	}
 
 	@PostMapping("/signup")

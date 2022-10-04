@@ -46,7 +46,7 @@ public class AccountService {
 	@Autowired
 	JwtUtils jwtUtils;	
 
-	public JwtResponse authenticate(@Valid LoginRequest loginRequest) {
+	public ResponseEntity<?> authenticate(@Valid LoginRequest loginRequest) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -59,28 +59,30 @@ public class AccountService {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
-		return new JwtResponse(jwt, 
+		return ResponseEntity.ok(new JwtResponse(jwt, 
 				accountDetails.getId(), 
 				accountDetails.getUsername(), 
+				accountDetails.getName(),
 				accountDetails.getEmail(), 
-				roles);
+				roles));
 	}
 
 	public ResponseEntity<?> register(@Valid SignupRequest signUpRequest) {
 		if (accountRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Username is already taken!"));
+					.body(new MessageResponse("Erro: Username já foi usado!"));
 		}
 
 		if (accountRepository.existsByEmail(signUpRequest.getEmail())) {
 			return ResponseEntity
 					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+					.body(new MessageResponse("Erro: Email já está em uso!"));
 		}
 
 		// Create new user's account
 		Account account = new Account(signUpRequest.getUsername(), 
+				signUpRequest.getName(),
 				signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));
 
@@ -89,26 +91,26 @@ public class AccountService {
 
 		if (strRoles == null) {
 			Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					.orElseThrow(() -> new RuntimeException("Erro: Perfil não foi encontrado."));
 			roles.add(userRole);
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
 				case "admin":
 					Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					.orElseThrow(() -> new RuntimeException("Erro: Perfil não foi encontrado."));
 					roles.add(adminRole);
 
 					break;
 				case "mod":
 					Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					.orElseThrow(() -> new RuntimeException("Erro: Perfil não foi encontrado."));
 					roles.add(modRole);
 
 					break;
 				default:
 					Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					.orElseThrow(() -> new RuntimeException("Erro: Perfil não foi encontrado."));
 					roles.add(userRole);
 				}
 			});
@@ -117,6 +119,6 @@ public class AccountService {
 		account.setRoles(roles);
 		accountRepository.save(account);
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(new MessageResponse("Usuário cadastrado com sucesso!"));
 	}
 }
