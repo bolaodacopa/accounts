@@ -24,6 +24,7 @@ import tk.bolaodacopa.accounts.payload.request.SignupRequest;
 import tk.bolaodacopa.accounts.payload.response.JwtResponse;
 import tk.bolaodacopa.accounts.payload.response.MessageResponse;
 import tk.bolaodacopa.accounts.repository.AccountRepository;
+import tk.bolaodacopa.accounts.repository.EmailAllowedRepository;
 import tk.bolaodacopa.accounts.repository.RoleRepository;
 import tk.bolaodacopa.accounts.security.jwt.JwtUtils;
 import tk.bolaodacopa.accounts.security.services.AccountDetailsImpl;
@@ -39,6 +40,9 @@ public class AccountService {
 
 	@Autowired
 	RoleRepository roleRepository;
+
+	@Autowired
+	EmailAllowedRepository emailAllowedRepository;	
 
 	@Autowired
 	PasswordEncoder encoder;
@@ -78,6 +82,12 @@ public class AccountService {
 			return ResponseEntity
 					.badRequest()
 					.body(new MessageResponse("Erro: Email já está em uso!"));
+		}
+
+		if (!(emailAllowedRepository.existsByEmail(signUpRequest.getEmail()))) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Erro: Email não permitido. Contacte o Administrador!"));
 		}
 
 		// Create new user's account
