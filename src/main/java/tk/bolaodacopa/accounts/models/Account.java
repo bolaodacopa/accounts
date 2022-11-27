@@ -36,6 +36,9 @@ public class Account {
 	@Size(max = 120)
 	private String password;
 
+	@Column(name = "resetpasswordtoken")
+	private String resetpasswordtoken;	
+	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(  name = "account_roles", 
 	joinColumns = @JoinColumn(name = "account_id"), 
@@ -51,6 +54,14 @@ public class Account {
 		this.email = email;
 		this.password = password;
 	}
+	
+	public Account(String username, String name, String email, String password, String resetpasswordtoken) {
+		this.username = username;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.resetpasswordtoken = resetpasswordtoken;
+	}	
 
 	public Long getId() {
 		return id;
@@ -98,6 +109,14 @@ public class Account {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getResetpasswordtoken() {
+		return resetpasswordtoken;
+	}
+
+	public void setResetpasswordtoken(String resetpasswordtoken) {
+		this.resetpasswordtoken = resetpasswordtoken;
 	}
 
 }

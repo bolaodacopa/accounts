@@ -16,16 +16,20 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import net.bytebuddy.utility.RandomString;
 import tk.bolaodacopa.accounts.models.Account;
 import tk.bolaodacopa.accounts.models.ERole;
 import tk.bolaodacopa.accounts.models.Role;
+import tk.bolaodacopa.accounts.payload.request.ForgotPasswordRequest;
 import tk.bolaodacopa.accounts.payload.request.LoginRequest;
+import tk.bolaodacopa.accounts.payload.request.ResetPasswordRequest;
 import tk.bolaodacopa.accounts.payload.request.SignupRequest;
 import tk.bolaodacopa.accounts.payload.response.JwtResponse;
 import tk.bolaodacopa.accounts.payload.response.MessageResponse;
 import tk.bolaodacopa.accounts.repository.AccountRepository;
 import tk.bolaodacopa.accounts.repository.EmailAllowedRepository;
 import tk.bolaodacopa.accounts.repository.RoleRepository;
+import tk.bolaodacopa.accounts.security.jwt.EmailUtils;
 import tk.bolaodacopa.accounts.security.jwt.JwtUtils;
 import tk.bolaodacopa.accounts.security.services.AccountDetailsImpl;
 
@@ -49,6 +53,9 @@ public class AccountService {
 
 	@Autowired
 	JwtUtils jwtUtils;	
+	
+	@Autowired
+	EmailUtils emailUtils;
 
 	public ResponseEntity<?> authenticate(@Valid LoginRequest loginRequest) {
 		Authentication authentication = authenticationManager.authenticate(
@@ -130,5 +137,35 @@ public class AccountService {
 		accountRepository.save(account);
 
 		return ResponseEntity.ok(new MessageResponse("Usuário cadastrado com sucesso!"));
+	}
+
+	public ResponseEntity<?> forgotPassword(@Valid ForgotPasswordRequest forgotPasswordRequest) {
+
+		Account account = accountRepository.findByUsernameAndEmail(forgotPasswordRequest.getUsername(), forgotPasswordRequest.getEmail())
+				.orElseThrow(() -> new RuntimeException("Erro: Usuário não encontrado com o username e email informados."));
+		
+		String token = RandomString.make(30);
+		
+		account.setResetpasswordtoken(token);
+		accountRepository.save(account);
+			
+		emailUtils.sendEmailForgotPassword(forgotPasswordRequest.getEmail(), token);
+		
+		return ResponseEntity.ok(new MessageResponse("Enviamos um link de redefinição de senha para o seu e-mail. Por favor, verifique."));
+	}
+
+	public ResponseEntity<?> resetpassword(@Valid ResetPasswordRequest resetPasswordRequest) {
+		
+		Account account = accountRepository.findByResetpasswordtoken(resetPasswordRequest.getToken())
+				.orElseThrow(() -> new RuntimeException("Erro: Token inválido."));
+		
+		String encodedPassword = encoder.encode(resetPasswordRequest.getPassword());
+		
+		account.setPassword(encodedPassword);
+		account.setResetpasswordtoken(null);
+		
+		accountRepository.save(account);
+		
+		return ResponseEntity.ok(new MessageResponse("A sua senha foi alterada com sucesso."));
 	}
 }

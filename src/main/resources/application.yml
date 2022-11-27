@@ -9,6 +9,17 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
     hibernate:
       ddl-auto: update
+  mail:
+    host: ${ACCOUNT_EMAIL_HOST}
+    username: ${ACCOUNT_EMAIL_USERNAME}
+    password: ${ACCOUNT_EMAIL_PASSWORD}
+    port: ${ACCOUNT_EMAIL_PORT}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true      
 
 bolaodacopa:
   app:

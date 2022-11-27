@@ -19,7 +19,9 @@ import tk.bolaodacopa.accounts.services.AccountService;
 import tk.bolaodacopa.accounts.services.EmailAllowedService;
 import tk.bolaodacopa.accounts.models.EmailAllowed;
 import tk.bolaodacopa.accounts.payload.request.EmailAllowedRequest;
+import tk.bolaodacopa.accounts.payload.request.ForgotPasswordRequest;
 import tk.bolaodacopa.accounts.payload.request.LoginRequest;
+import tk.bolaodacopa.accounts.payload.request.ResetPasswordRequest;
 import tk.bolaodacopa.accounts.payload.request.SignupRequest;
 
 @RestController
@@ -44,6 +46,16 @@ public class AccountController {
 	public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
 		return service.register(signUpRequest); 
 	}
+	
+	@PostMapping("/forgotpassword")
+	public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+		return service.forgotPassword(forgotPasswordRequest); 
+	}	
+
+	@PostMapping("/resetpassword")
+	public ResponseEntity<?> resetpassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+		return service.resetpassword(resetPasswordRequest); 
+	}	
 	
 	@PostMapping("/emailallowed")
 	public ResponseEntity<?> registerEmailAllowed(@RequestHeader("x-emailallowed-pass") String password, 
